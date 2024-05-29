@@ -1,7 +1,6 @@
 import streamlit as st
 import plotly.graph_objects as go
 import os
-import numpy as np
 
 # Ensure the path to the image is correct
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -269,18 +268,17 @@ if selected_companies:
 
     st.subheader(f"Final ESG Score Across Selected Holdings: {final_score:.2f}")
 
-    # Determine the top 5 preferences
-    sorted_avg_scores = sorted(average_scores.items(), key=lambda x: x[1], reverse=True)
-    top_preferences = sorted_avg_scores[:5]
-    other_preferences = sorted_avg_scores[5:]
+    # Determine the top 5 preferences based on dynamic weights
+    sorted_preferences = sorted(weights.items(), key=lambda x: x[1], reverse=True)[:5]
+    top_preferences = [item[0] for item in sorted_preferences]
 
     # Plotting average ESG scores for top 5 preferences using color-coded gauges
     fig_avg = go.Figure()
 
-    for i, (preference, value) in enumerate(top_preferences):
+    for i, preference in enumerate(top_preferences):
         fig_avg.add_trace(go.Indicator(
             mode="gauge+number",
-            value=value,
+            value=average_scores[preference],
             title={'text': preference},
             gauge={
                 'axis': {'range': [0, 100]},
@@ -303,9 +301,10 @@ if selected_companies:
 
     # Display other preferences as a list
     st.subheader("Other ESG Scores")
+    other_preferences = [item for item in weights.items() if item[0] not in top_preferences]
     other_scores_list = '<div class="list-scores">'
-    for preference, value in other_preferences:
-        other_scores_list += f'<p><b>{preference}:</b> {value:.2f}</p>'
+    for preference, _ in other_preferences:
+        other_scores_list += f'<p><b>{preference}:</b> {average_scores[preference]:.2f}</p>'
     other_scores_list += '</div>'
     st.markdown(other_scores_list, unsafe_allow_html=True)
 
