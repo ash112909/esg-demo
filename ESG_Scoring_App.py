@@ -178,6 +178,7 @@ sample_data = {
         'Risk Management': 70,
     },
 }
+
 # Custom CSS for header, footer, and sidebar styling
 st.markdown("""
     <style>
@@ -284,14 +285,15 @@ if selected_companies:
     st.subheader(f"Final ESG Score Across Selected Holdings: {final_score:.2f}")
 
     # Determine the top 5 preferences
-    sorted_avg_scores = sorted(average_scores.items(), key=lambda x: x[1], reverse=True)
-    top_preferences = sorted_avg_scores[:5]
-    other_preferences = sorted_avg_scores[5:]
+    sorted_weights = sorted(weights.items(), key=lambda x: x[1], reverse=True)
+    top_preferences = sorted_weights[:5]
+    other_preferences = sorted_weights[5:]
 
     # Plotting average ESG scores for top 5 preferences using color-coded gauges
     fig_avg = go.Figure()
 
-    for i, (preference, value) in enumerate(top_preferences):
+    for i, (preference, _) in enumerate(top_preferences):
+        value = average_scores[preference]
         fig_avg.add_trace(go.Indicator(
             mode="gauge+number",
             value=value,
@@ -318,8 +320,8 @@ if selected_companies:
     # Display other preferences as a list
     st.subheader("Other ESG Scores")
     other_scores_list = '<div class="list-scores">'
-    for preference, value in other_preferences:
-        other_scores_list += f'<p><b>{preference}:</b> {value:.2f}</p>'
+    for preference, _ in other_preferences:
+        other_scores_list += f'<p><b>{preference}:</b> {average_scores[preference]:.2f}</p>'
     other_scores_list += '</div>'
     st.markdown(other_scores_list, unsafe_allow_html=True)
 
