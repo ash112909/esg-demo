@@ -1,6 +1,7 @@
 import streamlit as st
 import plotly.graph_objects as go
 import os
+import numpy as np
 
 # Ensure the path to the image is correct
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -220,6 +221,24 @@ st.markdown("""
         .list-scores {
             padding: 10px;
         }
+        .summary-section {
+            background-color: #f8f8f8;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .comparison-charts {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .filter-options {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
     </style>
 """, unsafe_allow_html=True)
 
@@ -243,6 +262,9 @@ def calculate_average_esg(scores):
 
 # Main section for the home dashboard
 st.title("Score Dashboard")
+
+# Summary Section
+st.markdown('<div class="summary-section"><h3>ESG Scoring Summary</h3><p>Get key insights and trends from the ESG scores of your selected companies.</p></div>', unsafe_allow_html=True)
 
 # Select companies to include in the average calculation
 selected_companies = st.multiselect(
@@ -268,17 +290,18 @@ if selected_companies:
 
     st.subheader(f"Final ESG Score Across Selected Holdings: {final_score:.2f}")
 
-    # Determine the top 5 preferences based on dynamic weights
-    sorted_preferences = sorted(weights.items(), key=lambda x: x[1], reverse=True)[:5]
-    top_preferences = [item[0] for item in sorted_preferences]
+    # Determine the top 5 preferences
+    sorted_avg_scores = sorted(average_scores.items(), key=lambda x: x[1], reverse=True)
+    top_preferences = sorted_avg_scores[:5]
+    other_preferences = sorted_avg_scores[5:]
 
     # Plotting average ESG scores for top 5 preferences using color-coded gauges
     fig_avg = go.Figure()
 
-    for i, preference in enumerate(top_preferences):
+    for i, (preference, value) in enumerate(top_preferences):
         fig_avg.add_trace(go.Indicator(
             mode="gauge+number",
-            value=average_scores[preference],
+            value=value,
             title={'text': preference},
             gauge={
                 'axis': {'range': [0, 100]},
@@ -301,12 +324,42 @@ if selected_companies:
 
     # Display other preferences as a list
     st.subheader("Other ESG Scores")
-    other_preferences = [item for item in weights.items() if item[0] not in top_preferences]
     other_scores_list = '<div class="list-scores">'
-    for preference, _ in other_preferences:
-        other_scores_list += f'<p><b>{preference}:</b> {average_scores[preference]:.2f}</p>'
+    for preference, value in other_preferences:
+        other_scores_list += f'<p><b>{preference}:</b> {value:.2f}</p>'
     other_scores_list += '</div>'
     st.markdown(other_scores_list, unsafe_allow_html=True)
+
+    # Comparison Charts Section
+    st.markdown('<div class="comparison-charts"><h3>Comparison Charts</h3></div>', unsafe_allow_html=True)
+    comparison_fig = go.Figure()
+    for company in selected_companies:
+        comparison_fig.add_trace(go.Bar(
+            x=list(sample_data[company].keys()),
+            y=list(sample_data[company].values()),
+            name=company
+        ))
+    comparison_fig.update_layout(barmode='group', title="ESG Scores Comparison")
+    st.plotly_chart(comparison_fig)
+
+    # Filter Options Section
+    st.markdown('<div class="filter-options"><h3>Filter Options</h3></div>', unsafe_allow_html=True)
+    filters = st.multiselect(
+        "Filter by ESG Criteria",
+        options=list(sample_data['Apple Inc.'].keys()),
+        default=list(sample_data['Apple Inc.'].keys())
+    )
+    if filters:
+        filtered_data = {company: {key: value for key, value in sample_data[company].items() if key in filters} for company in selected_companies}
+        filtered_fig = go.Figure()
+        for company in selected_companies:
+            filtered_fig.add_trace(go.Bar(
+                x=list(filtered_data[company].keys()),
+                y=list(filtered_data[company].values()),
+                name=company
+            ))
+        filtered_fig.update_layout(barmode='group', title="Filtered ESG Scores Comparison")
+        st.plotly_chart(filtered_fig)
 
 # Add footer
 st.markdown('<div class="main-footer">Powered by BOK Financial</div>', unsafe_allow_html=True)
