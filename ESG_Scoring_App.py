@@ -233,6 +233,14 @@ st.markdown("""
             border-radius: 8px;
             margin-bottom: 20px;
         }
+        .columns {
+            display: flex;
+            flex-wrap: wrap;
+        }
+        .column {
+            flex: 50%;
+            padding: 10px;
+        }
     </style>
 """, unsafe_allow_html=True)
 
@@ -319,9 +327,13 @@ if selected_companies:
 
     # Display other preferences as a list
     st.subheader("Other ESG Scores")
-    other_scores_list = '<div class="list-scores">'
-    for preference, _ in other_preferences:
+    other_scores_list = '<div class="list-scores columns">'
+    for i, (preference, _) in enumerate(other_preferences):
+        if i % 2 == 0:
+            other_scores_list += '<div class="column">'
         other_scores_list += f'<p><b>{preference}:</b> {average_scores[preference]:.2f}</p>'
+        if i % 2 == 1 or i == len(other_preferences) - 1:
+            other_scores_list += '</div>'
     other_scores_list += '</div>'
     st.markdown(other_scores_list, unsafe_allow_html=True)
 
@@ -340,7 +352,9 @@ if selected_companies:
             filtered_fig.add_trace(go.Bar(
                 x=list(filtered_data[company].keys()),
                 y=list(filtered_data[company].values()),
-                name=company
+                name=company,
+                text=list(filtered_data[company].values()),
+                textposition='auto'
             ))
         filtered_fig.update_layout(barmode='group', title="Filtered ESG Scores Comparison")
         st.plotly_chart(filtered_fig)
