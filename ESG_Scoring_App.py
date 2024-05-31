@@ -178,7 +178,6 @@ sample_data = {
         'Risk Management': 70,
     },
 }
-
 # Custom CSS for header, footer, and sidebar styling
 st.markdown("""
     <style>
@@ -223,12 +222,6 @@ st.markdown("""
         }
         .summary-section {
             background-color: #f8f8f8;
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-        }
-        .comparison-charts {
-            background-color: #ffffff;
             padding: 20px;
             border-radius: 8px;
             margin-bottom: 20px;
@@ -330,24 +323,13 @@ if selected_companies:
     other_scores_list += '</div>'
     st.markdown(other_scores_list, unsafe_allow_html=True)
 
-    # Comparison Charts Section
-    st.markdown('<div class="comparison-charts"><h3>Comparison Charts</h3></div>', unsafe_allow_html=True)
-    comparison_fig = go.Figure()
-    for company in selected_companies:
-        comparison_fig.add_trace(go.Bar(
-            x=list(sample_data[company].keys()),
-            y=list(sample_data[company].values()),
-            name=company
-        ))
-    comparison_fig.update_layout(barmode='group', title="ESG Scores Comparison")
-    st.plotly_chart(comparison_fig)
-
     # Filter Options Section
     st.markdown('<div class="filter-options"><h3>Filter Options</h3></div>', unsafe_allow_html=True)
+    filter_options = [preference for preference, _ in top_preferences]
     filters = st.multiselect(
         "Filter by ESG Criteria",
         options=list(sample_data['Apple Inc.'].keys()),
-        default=list(sample_data['Apple Inc.'].keys())
+        default=filter_options
     )
     if filters:
         filtered_data = {company: {key: value for key, value in sample_data[company].items() if key in filters} for company in selected_companies}
