@@ -241,6 +241,9 @@ st.markdown("""
             flex: 50%;
             padding: 10px;
         }
+        .column p {
+            margin: 5px 0;
+        }
     </style>
 """, unsafe_allow_html=True)
 
