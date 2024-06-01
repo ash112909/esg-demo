@@ -291,7 +291,8 @@ def generate_esg_summary(final_score, top_preferences, average_scores):
 st.title("Score Dashboard")
 
 # Summary Section
-st.markdown('<div class="summary-section"><h3>ESG Scoring Summary</h3>', unsafe_allow_html=True)
+st.markdown('<div class="summary-section"><h3>Scoring Summary</h3>', unsafe_allow_html=True)
+summary_container = st.empty()
 
 # Select companies to include in the average calculation
 selected_companies = st.multiselect(
@@ -323,7 +324,7 @@ if selected_companies:
 
     # Generate ESG Summary
     esg_summary = generate_esg_summary(final_score, top_preferences, average_scores)
-    st.markdown(f'<div class="summary-text">{esg_summary}</div>', unsafe_allow_html=True)
+    summary_container.markdown(f'<div class="summary-text">{esg_summary}</div>', unsafe_allow_html=True)
 
     # Plotting average ESG scores for top preferences using color-coded gauges
     fig_avg = go.Figure()
