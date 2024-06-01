@@ -291,7 +291,7 @@ def generate_esg_summary(final_score, top_preferences, average_scores):
 st.title("Score Dashboard")
 
 # Summary Section
-st.markdown('<div class="summary-section"><h3>Scoring Summary</h3>', unsafe_allow_html=True)
+st.markdown('<div class="summary-section"><h3>Scoring Summary</h3></div>', unsafe_allow_html=True)
 summary_container = st.empty()
 
 # Select companies to include in the average calculation
@@ -334,7 +334,7 @@ if selected_companies:
         fig_avg.add_trace(go.Indicator(
             mode="gauge+number",
             value=value,
-            title={'text': preference, 'font': {'size': 12}},
+            title={'text': preference, 'font': {'size': 20}},  # Increased font size to 20
             gauge={
                 'axis': {'range': [0, 100], 'tickwidth': 1, 'tickcolor': "darkblue"},
                 'bar': {'color': "#800000"},
@@ -386,7 +386,7 @@ if selected_companies:
                 text=list(filtered_data[company].values()),
                 textposition='auto'
             ))
-        filtered_fig.update_layout(barmode='group', title="Filtered ESG Scores Comparison")
+        filtered_fig.update_layout(barmode='group', title="Filtered ESG Scores Comparison", font={'size': 14})  # Adjusted font size
         st.plotly_chart(filtered_fig)
 
 # Add footer
