@@ -329,14 +329,14 @@ if selected_companies:
     # Plotting average ESG scores for top preferences using color-coded gauges
     fig_avg = go.Figure()
 
-    for i, (preference, _) in enumerate(top_preferences):
+    for i, (preference, _) in enumerate(top_preferences[:5]):
         value = average_scores[preference]
         fig_avg.add_trace(go.Indicator(
             mode="gauge+number",
             value=value,
-            title={'text': preference},
+            title={'text': preference, 'font': {'size': 12}},
             gauge={
-                'axis': {'range': [0, 100]},
+                'axis': {'range': [0, 100], 'tickwidth': 1, 'tickcolor': "darkblue"},
                 'bar': {'color': "#800000"},
                 'steps': [
                     {'range': [0, 50], 'color': "red"},
@@ -349,7 +349,8 @@ if selected_companies:
 
     fig_avg.update_layout(
         grid={'rows': 3, 'columns': 2, 'pattern': "independent"},
-        height=600, width=800
+        height=600, width=800,
+        margin=dict(l=20, r=20, t=40, b=20)
     )
 
     st.plotly_chart(fig_avg)
@@ -357,11 +358,11 @@ if selected_companies:
     # Display other preferences as a list
     st.subheader("Other ESG Scores")
     other_scores_list = '<div class="list-scores columns">'
-    for i, (preference, _) in enumerate(top_preferences[3:]):
+    for i, (preference, _) in enumerate(top_preferences[5:]):
         if i % 2 == 0:
             other_scores_list += '<div class="column">'
         other_scores_list += f'<p><b>{preference}:</b> {average_scores[preference]:.2f}</p>'
-        if i % 2 == 1 or i == len(top_preferences[3:]) - 1:
+        if i % 2 == 1 or i == len(top_preferences[5:]) - 1:
             other_scores_list += '</div>'
     other_scores_list += '</div>'
     st.markdown(other_scores_list, unsafe_allow_html=True)
