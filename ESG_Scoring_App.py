@@ -244,6 +244,10 @@ st.markdown("""
         .column p {
             margin: 5px 0;
         }
+        .summary-text {
+            font-size: 18px;
+            margin: 10px 0;
+        }
     </style>
 """, unsafe_allow_html=True)
 
@@ -267,12 +271,12 @@ def calculate_average_esg(scores):
 
 # Function to generate the ESG summary
 def generate_esg_summary(final_score, top_preferences, average_scores):
-    high_scores = [f'{item[0]} ({average_scores[item[0]]})' for item in top_preferences[:3]]
-    low_scores = [f'{item[0]} ({average_scores[item[0]]})' for item in top_preferences[-3:]]
+    high_scores = [f'{item[0]} ({average_scores[item[0]]:.2f})' for item in top_preferences[:3]]
+    low_scores = [f'{item[0]} ({average_scores[item[0]]:.2f})' for item in top_preferences[-3:]]
 
     summary = f"Your overall ESG score is {final_score:.2f}. Key areas include:\n"
-    summary += f"**High scores**: {', '.join(high_scores)}.\n"
-    summary += f"**Low scores**: {', '.join(low_scores)}.\n"
+    summary += f"<b>High scores</b>: {', '.join(high_scores)}.<br>"
+    summary += f"<b>Low scores</b>: {', '.join(low_scores)}.<br>"
 
     if final_score < 50:
         summary += "Consider rebalancing your portfolio to include companies with better performance in low-scoring areas to mitigate risks and enhance returns. For example, reducing exposure to companies with poor carbon footprint scores can significantly enhance your portfolio's sustainability."
@@ -319,7 +323,7 @@ if selected_companies:
 
     # Generate ESG Summary
     esg_summary = generate_esg_summary(final_score, top_preferences, average_scores)
-    st.markdown(esg_summary, unsafe_allow_html=True)
+    st.markdown(f'<div class="summary-text">{esg_summary}</div>', unsafe_allow_html=True)
 
     # Plotting average ESG scores for top preferences using color-coded gauges
     fig_avg = go.Figure()
