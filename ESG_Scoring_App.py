@@ -265,11 +265,29 @@ def calculate_average_esg(scores):
         average_scores[key] = average_scores[key] / total_companies
     return average_scores
 
+# Function to generate the ESG summary
+def generate_esg_summary(final_score, top_preferences, average_scores):
+    high_scores = [f'{item[0]} ({average_scores[item[0]]})' for item in top_preferences[:3]]
+    low_scores = [f'{item[0]} ({average_scores[item[0]]})' for item in top_preferences[-3:]]
+
+    summary = f"Your overall ESG score is {final_score:.2f}. Key areas include:\n"
+    summary += f"**High scores**: {', '.join(high_scores)}.\n"
+    summary += f"**Low scores**: {', '.join(low_scores)}.\n"
+
+    if final_score < 50:
+        summary += "Consider rebalancing your portfolio to include companies with better performance in low-scoring areas to mitigate risks and enhance returns. For example, reducing exposure to companies with poor carbon footprint scores can significantly enhance your portfolio's sustainability."
+    elif 50 <= final_score <= 80:
+        summary += "To optimize your ESG impact, consider reallocating towards companies with higher performance in low-scoring areas. Enhancing diversity and inclusion by investing in companies with strong practices can also contribute to better overall ESG performance."
+    else:
+        summary += "This robust ESG performance may positively influence long-term returns. To maintain and enhance this high standard, continue monitoring and rebalancing your portfolio towards top-performing ESG companies. Staying proactive ensures sustained performance and potential growth."
+
+    return summary
+
 # Main section for the home dashboard
 st.title("Score Dashboard")
 
 # Summary Section
-st.markdown('<div class="summary-section"><h3>ESG Scoring Summary</h3><p>Get key insights and trends from the ESG scores of your selected companies.</p></div>', unsafe_allow_html=True)
+st.markdown('<div class="summary-section"><h3>ESG Scoring Summary</h3>', unsafe_allow_html=True)
 
 # Select companies to include in the average calculation
 selected_companies = st.multiselect(
@@ -295,12 +313,15 @@ if selected_companies:
 
     st.subheader(f"Final ESG Score Across Selected Holdings: {final_score:.2f}")
 
-    # Determine the top 5 preferences
+    # Determine the top preferences
     sorted_weights = sorted(weights.items(), key=lambda x: x[1], reverse=True)
-    top_preferences = sorted_weights[:5]
-    other_preferences = sorted_weights[5:]
+    top_preferences = sorted_weights
 
-    # Plotting average ESG scores for top 5 preferences using color-coded gauges
+    # Generate ESG Summary
+    esg_summary = generate_esg_summary(final_score, top_preferences, average_scores)
+    st.markdown(esg_summary, unsafe_allow_html=True)
+
+    # Plotting average ESG scores for top preferences using color-coded gauges
     fig_avg = go.Figure()
 
     for i, (preference, _) in enumerate(top_preferences):
@@ -331,11 +352,11 @@ if selected_companies:
     # Display other preferences as a list
     st.subheader("Other ESG Scores")
     other_scores_list = '<div class="list-scores columns">'
-    for i, (preference, _) in enumerate(other_preferences):
+    for i, (preference, _) in enumerate(top_preferences[3:]):
         if i % 2 == 0:
             other_scores_list += '<div class="column">'
         other_scores_list += f'<p><b>{preference}:</b> {average_scores[preference]:.2f}</p>'
-        if i % 2 == 1 or i == len(other_preferences) - 1:
+        if i % 2 == 1 or i == len(top_preferences[3:]) - 1:
             other_scores_list += '</div>'
     other_scores_list += '</div>'
     st.markdown(other_scores_list, unsafe_allow_html=True)
