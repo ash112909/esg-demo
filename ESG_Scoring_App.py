@@ -291,7 +291,7 @@ def generate_esg_summary(final_score, top_preferences, average_scores):
 st.title("Score Dashboard")
 
 # Summary Section
-st.markdown('<div class="summary-section"><h3>Scoring Summary</h3></div>', unsafe_allow_html=True)
+st.markdown('<div class="summary-section"><h3>Scoring Summary</h3>', unsafe_allow_html=True)
 summary_container = st.empty()
 
 # Select companies to include in the average calculation
