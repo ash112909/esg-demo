@@ -369,7 +369,7 @@ if selected_companies:
 
     # Filter Options Section
     st.markdown('<div class="filter-options"><h3>Filter Options</h3></div>', unsafe_allow_html=True)
-    filter_options = [preference for preference, _ in top_preferences]
+    filter_options = [preference for preference, _ in top_preferences[:5]]
     filters = st.multiselect(
         "Filter by ESG Criteria",
         options=list(sample_data['Apple Inc.'].keys()),
