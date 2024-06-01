@@ -292,7 +292,7 @@ st.title("Score Dashboard")
 
 # Summary Section
 st.markdown('<div class="summary-section"><h3>Scoring Summary</h3>', unsafe_allow_html=True)
-summary_container = st.empty()
+summary_container = st.generate_esg_summary
 
 # Select companies to include in the average calculation
 selected_companies = st.multiselect(
