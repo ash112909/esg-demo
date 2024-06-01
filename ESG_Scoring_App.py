@@ -274,9 +274,9 @@ def generate_esg_summary(final_score, top_preferences, average_scores):
     high_scores = [f'{item[0]} ({average_scores[item[0]]:.2f})' for item in top_preferences[:3]]
     low_scores = [f'{item[0]} ({average_scores[item[0]]:.2f})' for item in top_preferences[-3:]]
 
-    summary = f"Your overall ESG score is {final_score:.2f}. Key areas include:\n"
-    summary += f"<b>High scores</b>: {', '.join(high_scores)}.<br>"
-    summary += f"<b>Low scores</b>: {', '.join(low_scores)}.<br>"
+    summary = f"Your overall ESG score is {final_score:.2f}. Key areas include:<br><br>\n"
+    summary += f"<b>High scores</b>: {', '.join(high_scores)}.<br><br>"
+    summary += f"<b>Low scores</b>: {', '.join(low_scores)}.<br><br>"
 
     if final_score < 50:
         summary += "Consider rebalancing your portfolio to include companies with better performance in low-scoring areas to mitigate risks and enhance returns. For example, reducing exposure to companies with poor carbon footprint scores can significantly enhance your portfolio's sustainability."
