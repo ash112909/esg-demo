@@ -270,9 +270,10 @@ def calculate_average_esg(scores):
     return average_scores
 
 # Function to generate the ESG summary
-def generate_esg_summary(final_score, top_preferences, average_scores):
-    high_scores = [f'{item[0]} ({average_scores[item[0]]:.2f})' for item in top_preferences[:3]]
-    low_scores = [f'{item[0]} ({average_scores[item[0]]:.2f})' for item in top_preferences[-3:]]
+def generate_esg_summary(final_score, average_scores):
+    sorted_scores = sorted(average_scores.items(), key=lambda x: x[1])
+    low_scores = [f'{item[0]} ({item[1]:.2f})' for item in sorted_scores[:3]]
+    high_scores = [f'{item[0]} ({item[1]:.2f})' for item in sorted_scores[-3:]]
 
     summary = f"Your overall ESG score is {final_score:.2f}. Key areas include:<br><br>\n"
     summary += f"<b>High scores</b>: {', '.join(high_scores)}.<br><br>"
@@ -292,7 +293,6 @@ st.title("Score Dashboard")
 
 # Summary Section
 summary_container = st.empty()
-summary_container.markdown('<div class="summary-section"><h3>Scoring Summary</h3></div>', unsafe_allow_html=True)
 
 # Select companies to include in the average calculation
 selected_companies = st.multiselect(
@@ -318,18 +318,14 @@ if selected_companies:
 
     st.subheader(f"Final ESG Score Across Selected Holdings: {final_score:.2f}")
 
-    # Determine the top preferences
-    sorted_weights = sorted(weights.items(), key=lambda x: x[1], reverse=True)
-    top_preferences = sorted_weights
-
     # Generate ESG Summary
-    esg_summary = generate_esg_summary(final_score, top_preferences, average_scores)
+    esg_summary = generate_esg_summary(final_score, average_scores)
     summary_container.markdown(f'<div class="summary-section"><h3>Scoring Summary</h3><div class="summary-text">{esg_summary}</div></div>', unsafe_allow_html=True)
 
     # Plotting average ESG scores for top preferences using color-coded gauges
     fig_avg = go.Figure()
 
-    for i, (preference, _) in enumerate(top_preferences[:5]):
+    for i, (preference, _) in enumerate(sorted(weights.items(), key=lambda x: x[1], reverse=True)[:5]):
         value = average_scores[preference]
         fig_avg.add_trace(go.Indicator(
             mode="gauge+number",
@@ -358,18 +354,18 @@ if selected_companies:
     # Display other preferences as a list
     st.subheader("Other ESG Scores")
     other_scores_list = '<div class="list-scores columns">'
-    for i, (preference, _) in enumerate(top_preferences[5:]):
+    for i, (preference, _) in enumerate(sorted(weights.items(), key=lambda x: x[1], reverse=True)[5:]):
         if i % 2 == 0:
             other_scores_list += '<div class="column">'
         other_scores_list += f'<p><b>{preference}:</b> {average_scores[preference]:.2f}</p>'
-        if i % 2 == 1 or i == len(top_preferences[5:]) - 1:
+        if i % 2 == 1 or i == len(sorted(weights.items(), key=lambda x: x[1], reverse=True)[5:]) - 1:
             other_scores_list += '</div>'
     other_scores_list += '</div>'
     st.markdown(other_scores_list, unsafe_allow_html=True)
 
     # Filter Options Section
     st.markdown('<div class="filter-options"><h3>Filter Options</h3></div>', unsafe_allow_html=True)
-    filter_options = [preference for preference, _ in top_preferences[:5]]
+    filter_options = [preference for preference, _ in sorted(weights.items(), key=lambda x: x[1], reverse=True)[:5]]
     filters = st.multiselect(
         "Filter by ESG Criteria",
         options=list(sample_data['Apple Inc.'].keys()),
