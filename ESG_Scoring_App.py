@@ -385,5 +385,50 @@ if selected_companies:
         filtered_fig.update_layout(barmode='group', title="Filtered ESG Scores Comparison", font={'size': 14})  # Adjusted font size
         st.plotly_chart(filtered_fig)
 
+# Function to generate random historical trend data
+def generate_random_trend_data():
+    num_years = 5
+    trends = {}
+    for company, scores in sample_data.items():
+        company_trends = {}
+        for category, score in scores.items():
+            # Generate random scores for the past 5 years
+            historical_scores = np.random.randint(score - 10, score + 10, num_years)
+            company_trends[category] = historical_scores.tolist()
+        trends[company] = company_trends
+    return trends
+
+# Function to plot historical trend data
+def plot_historical_trends(trends):
+    for company, company_trends in trends.items():
+        fig = go.Figure()
+        for category, scores in company_trends.items():
+            fig.add_trace(go.Scatter(
+                x=list(range(1, len(scores) + 1)),
+                y=scores,
+                mode='lines+markers',
+                name=category
+            ))
+        fig.update_layout(
+            title=f"{company} - Historical ESG Trends",
+            xaxis_title="Year",
+            yaxis_title="Score",
+            font=dict(size=14),  # Adjust font size
+            legend=dict(
+                orientation="h",
+                yanchor="bottom",
+                y=1.02,
+                xanchor="right",
+                x=1
+            )
+        )
+        st.plotly_chart(fig)
+
+# Generate random historical trend data
+historical_trends = generate_random_trend_data()
+
+# Plot historical trend data
+plot_historical_trends(historical_trends)
+
 # Add footer
 st.markdown('<div class="main-footer">Powered by BOK Financial</div>', unsafe_allow_html=True)
