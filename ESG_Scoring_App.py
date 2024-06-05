@@ -385,7 +385,6 @@ if selected_companies:
         filtered_fig.update_layout(barmode='group', title="Filtered ESG Scores Comparison", font={'size': 14})  # Adjusted font size
         st.plotly_chart(filtered_fig)
 
-# Function to generate random historical trend data
 def generate_random_trend_data():
     num_years = 5
     trends = {}
@@ -404,7 +403,7 @@ def plot_historical_trends(trends):
         fig = go.Figure()
         for category, scores in company_trends.items():
             fig.add_trace(go.Scatter(
-                x=list(range(1, len(scores) + 1)),
+                x=list(range(2020 - len(scores) + 1, 2021)),
                 y=scores,
                 mode='lines+markers',
                 name=category
