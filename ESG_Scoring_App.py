@@ -389,6 +389,7 @@ if selected_companies:
 def generate_random_trend_data():
     num_years = 5
     trends = {}
+    overall_trends = {}
     for company, scores in sample_data.items():
         company_trends = {}
         for category, score in scores.items():
@@ -396,16 +397,25 @@ def generate_random_trend_data():
             historical_scores = np.random.randint(score - 10, score + 10, num_years)
             company_trends[category] = historical_scores.tolist()
         trends[company] = company_trends
-    return trends
+        # Calculate overall trend for each category across all companies
+        for category, historical_scores in company_trends.items():
+            if category not in overall_trends:
+                overall_trends[category] = np.array(historical_scores)
+            else:
+                overall_trends[category] += np.array(historical_scores)
+    # Average out the overall trends
+    for category in overall_trends:
+        overall_trends[category] = overall_trends[category] / len(sample_data)
+    return trends, overall_trends
 
 # Function to plot historical trend data
-def plot_historical_trends(trends, preferences):
+def plot_historical_trends(trends, preferences, overall_trends=None):
     for company, company_trends in trends.items():
         fig = go.Figure()
         for category, scores in company_trends.items():
             if category in preferences:
                 fig.add_trace(go.Scatter(
-                    x=list(range(2017, 2022)),  # Only whole number years
+                    x=list(range(2018, 2023)),  # Only whole number years
                     y=scores,
                     mode='lines+markers',
                     name=category
@@ -424,9 +434,33 @@ def plot_historical_trends(trends, preferences):
             )
         )
         st.plotly_chart(fig)
+    if overall_trends:
+        fig = go.Figure()
+        for category, scores in overall_trends.items():
+            if category in preferences:
+                fig.add_trace(go.Scatter(
+                    x=list(range(2018, 2023)),  # Only whole number years
+                    y=scores,
+                    mode='lines+markers',
+                    name=category
+                ))
+        fig.update_layout(
+            title=f"Overall Portfolio - Historical ESG Trends",
+            xaxis_title="Year",
+            yaxis_title="Score",
+            font=dict(size=14),  # Adjust font size
+            legend=dict(
+                orientation="h",
+                yanchor="bottom",
+                y=1.02,
+                xanchor="right",
+                x=1
+            )
+        )
+        st.plotly_chart(fig)
 
 # Sidebar for filtering preferences
-st.sidebar.header("Filter Preferences")
+st.sidebar.header("Filter Preferences for Historical Trends")
 all_preferences = list(sample_data['Apple Inc.'].keys())
 default_preferences = all_preferences[:5]  # Display only the top 5 preferences by default
 
@@ -437,10 +471,10 @@ selected_preferences = st.sidebar.multiselect(
 )
 
 # Generate random historical trend data
-historical_trends = generate_random_trend_data()
+historical_trends, overall_trends = generate_random_trend_data()
 
 # Plot historical trend data for the selected preferences
-plot_historical_trends(historical_trends, selected_preferences)
+plot_historical_trends(historical_trends, selected_preferences, overall_trends)
 
 # Add footer
 st.markdown('<div class="main-footer">Powered by BOK Financial</div>', unsafe_allow_html=True)
