@@ -408,56 +408,58 @@ def generate_random_trend_data():
         overall_trends[category] = overall_trends[category] / len(sample_data)
     return trends, overall_trends
 
-# Function to plot historical trend data
-def plot_historical_trends(trends, preferences, overall_trends=None):
-    for company, company_trends in trends.items():
-        fig = go.Figure()
-        for category, scores in company_trends.items():
-            if category in preferences:
-                fig.add_trace(go.Scatter(
-                    x=list(range(2018, 2023)),  # Only whole number years
-                    y=scores,
-                    mode='lines+markers',
-                    name=category
-                ))
-        fig.update_layout(
-            title=f"{company} - Historical ESG Trends",
-            xaxis_title="Year",
-            yaxis_title="Score",
-            font=dict(size=14),  # Adjust font size
-            legend=dict(
-                orientation="h",
-                yanchor="bottom",
-                y=1.02,
-                xanchor="right",
-                x=1
-            )
+# Function to plot historical trend data for a single company
+def plot_historical_trend_for_company(trends, company, preferences):
+    fig = go.Figure()
+    company_trends = trends[company]
+    for category, scores in company_trends.items():
+        if category in preferences:
+            fig.add_trace(go.Scatter(
+                x=list(range(2018, 2023)),  # Only whole number years
+                y=scores,
+                mode='lines+markers',
+                name=category
+            ))
+    fig.update_layout(
+        title=f"{company} - Historical ESG Trends",
+        xaxis_title="Year",
+        yaxis_title="Score",
+        font=dict(size=14),  # Adjust font size
+        legend=dict(
+            orientation="h",
+            yanchor="bottom",
+            y=1.02,
+            xanchor="right",
+            x=1
         )
-        st.plotly_chart(fig)
-    if overall_trends:
-        fig = go.Figure()
-        for category, scores in overall_trends.items():
-            if category in preferences:
-                fig.add_trace(go.Scatter(
-                    x=list(range(2018, 2023)),  # Only whole number years
-                    y=scores,
-                    mode='lines+markers',
-                    name=category
-                ))
-        fig.update_layout(
-            title=f"Overall Portfolio - Historical ESG Trends",
-            xaxis_title="Year",
-            yaxis_title="Score",
-            font=dict(size=14),  # Adjust font size
-            legend=dict(
-                orientation="h",
-                yanchor="bottom",
-                y=1.02,
-                xanchor="right",
-                x=1
-            )
+    )
+    st.plotly_chart(fig)
+
+# Function to plot overall historical trend data for the portfolio
+def plot_overall_historical_trends(overall_trends, preferences):
+    fig = go.Figure()
+    for category, scores in overall_trends.items():
+        if category in preferences:
+            fig.add_trace(go.Scatter(
+                x=list(range(2018, 2023)),  # Only whole number years
+                y=scores,
+                mode='lines+markers',
+                name=category
+            ))
+    fig.update_layout(
+        title=f"Overall Portfolio - Historical ESG Trends",
+        xaxis_title="Year",
+        yaxis_title="Score",
+        font=dict(size=14),  # Adjust font size
+        legend=dict(
+            orientation="h",
+            yanchor="bottom",
+            y=1.02,
+            xanchor="right",
+            x=1
         )
-        st.plotly_chart(fig)
+    )
+    st.plotly_chart(fig)
 
 # Sidebar for filtering preferences
 st.sidebar.header("Filter Preferences for Historical Trends")
@@ -470,11 +472,20 @@ selected_preferences = st.sidebar.multiselect(
     default=default_preferences
 )
 
+# Dropdown for selecting a company
+selected_company = st.sidebar.selectbox(
+    "Select Company",
+    options=list(sample_data.keys())
+)
+
 # Generate random historical trend data
 historical_trends, overall_trends = generate_random_trend_data()
 
-# Plot historical trend data for the selected preferences
-plot_historical_trends(historical_trends, selected_preferences, overall_trends)
+# Plot historical trend data for the selected company
+plot_historical_trend_for_company(historical_trends, selected_company, selected_preferences)
+
+# Plot overall historical trend data for the portfolio
+plot_overall_historical_trends(overall_trends, selected_preferences)
 
 # Add footer
 st.markdown('<div class="main-footer">Powered by BOK Financial</div>', unsafe_allow_html=True)
