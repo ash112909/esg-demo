@@ -385,6 +385,7 @@ if selected_companies:
         filtered_fig.update_layout(barmode='group', title="Filtered ESG Scores Comparison", font={'size': 14})  # Adjusted font size
         st.plotly_chart(filtered_fig)
 
+# Function to generate random historical trend data
 def generate_random_trend_data():
     num_years = 5
     trends = {}
@@ -398,16 +399,17 @@ def generate_random_trend_data():
     return trends
 
 # Function to plot historical trend data
-def plot_historical_trends(trends):
+def plot_historical_trends(trends, preferences):
     for company, company_trends in trends.items():
         fig = go.Figure()
         for category, scores in company_trends.items():
-            fig.add_trace(go.Scatter(
-                x=list(range(2020 - len(scores) + 1, 2021)),
-                y=scores,
-                mode='lines+markers',
-                name=category
-            ))
+            if category in preferences:
+                fig.add_trace(go.Scatter(
+                    x=list(range(2017, 2022)),  # Only whole number years
+                    y=scores,
+                    mode='lines+markers',
+                    name=category
+                ))
         fig.update_layout(
             title=f"{company} - Historical ESG Trends",
             xaxis_title="Year",
@@ -423,11 +425,22 @@ def plot_historical_trends(trends):
         )
         st.plotly_chart(fig)
 
+# Sidebar for filtering preferences
+st.sidebar.header("Filter Preferences")
+all_preferences = list(sample_data['Apple Inc.'].keys())
+default_preferences = all_preferences[:5]  # Display only the top 5 preferences by default
+
+selected_preferences = st.sidebar.multiselect(
+    "Select Preferences to Display",
+    options=all_preferences,
+    default=default_preferences
+)
+
 # Generate random historical trend data
 historical_trends = generate_random_trend_data()
 
-# Plot historical trend data
-plot_historical_trends(historical_trends)
+# Plot historical trend data for the selected preferences
+plot_historical_trends(historical_trends, selected_preferences)
 
 # Add footer
 st.markdown('<div class="main-footer">Powered by BOK Financial</div>', unsafe_allow_html=True)
