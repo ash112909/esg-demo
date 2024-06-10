@@ -252,7 +252,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # Add header
-st.markdown('<div class="main-header">BOK Financial ESG Scoring Application</div>', unsafe_allow_html=True)
+st.markdown('<div class="main-header">Personal Score Application</div>', unsafe_allow_html=True)
 
 # Sidebar content
 st.sidebar.image(logo_path, use_column_width=True)
@@ -275,16 +275,16 @@ def generate_esg_summary(final_score, average_scores):
     low_scores = [f'{item[0]} ({item[1]:.2f})' for item in sorted_scores[:3]]
     high_scores = [f'{item[0]} ({item[1]:.2f})' for item in sorted_scores[-3:]]
 
-    summary = f"Your overall ESG score is {final_score:.2f}. Key areas include:<br><br>\n"
+    summary = f"Your overall score is {final_score:.2f}. Key areas include:<br><br>\n"
     summary += f"<b>High scores</b>: {', '.join(high_scores)}.<br><br>"
     summary += f"<b>Low scores</b>: {', '.join(low_scores)}.<br><br>"
 
     if final_score < 50:
         summary += "Consider rebalancing your portfolio to include companies with better performance in low-scoring areas to mitigate risks and enhance returns. For example, reducing exposure to companies with poor carbon footprint scores can significantly enhance your portfolio's sustainability."
     elif 50 <= final_score <= 80:
-        summary += "To optimize your ESG impact, consider reallocating towards companies with higher performance in low-scoring areas. Enhancing diversity and inclusion by investing in companies with strong practices can also contribute to better overall ESG performance."
+        summary += "To optimize your impact, consider reallocating towards companies with higher performance in low-scoring areas. Enhancing diversity and inclusion by investing in companies with strong practices can also contribute to better overall performance."
     else:
-        summary += "This robust ESG performance may positively influence long-term returns. To maintain and enhance this high standard, continue monitoring and rebalancing your portfolio towards top-performing ESG companies. Staying proactive ensures sustained performance and potential growth."
+        summary += "This robust performance may positively influence long-term returns. To maintain and enhance this high standard, continue monitoring and rebalancing your portfolio towards top-performing companies. Staying proactive ensures sustained performance and potential growth."
 
     return summary
 
@@ -296,7 +296,7 @@ summary_container = st.empty()
 
 # Select companies to include in the average calculation
 selected_companies = st.multiselect(
-    "Select Companies for Average ESG Score",
+    "Select Companies for Average Score",
     options=list(sample_data.keys()),
     default=list(sample_data.keys())
 )
@@ -316,7 +316,7 @@ if selected_companies:
         average_scores[subsector] * weights[subsector] / total_weight for subsector in average_scores
     )
 
-    st.subheader(f"Final ESG Score Across Selected Holdings: {final_score:.2f}")
+    st.subheader(f"Final Score Across Selected Holdings: {final_score:.2f}")
 
     # Generate ESG Summary
     esg_summary = generate_esg_summary(final_score, average_scores)
@@ -367,7 +367,7 @@ if selected_companies:
     st.markdown('<div class="filter-options"><h3>Filter Options</h3></div>', unsafe_allow_html=True)
     filter_options = [preference for preference, _ in sorted(weights.items(), key=lambda x: x[1], reverse=True)[:5]]
     filters = st.multiselect(
-        "Filter by ESG Criteria",
+        "Filter by Criteria",
         options=list(sample_data['Apple Inc.'].keys()),
         default=filter_options
     )
@@ -382,7 +382,7 @@ if selected_companies:
                 text=list(filtered_data[company].values()),
                 textposition='auto'
             ))
-        filtered_fig.update_layout(barmode='group', title="Filtered ESG Scores Comparison", font={'size': 14})  # Adjusted font size
+        filtered_fig.update_layout(barmode='group', title="Filtered Scores Comparison", font={'size': 14})  # Adjusted font size
         st.plotly_chart(filtered_fig)
 
 # Function to generate random historical trend data
@@ -421,7 +421,7 @@ def plot_historical_trend_for_company(trends, company, preferences):
                 name=category
             ))
     fig.update_layout(
-        title=f"{company} - Historical ESG Trends",
+        title=f"{company} - Historical Trends",
         xaxis_title="Year",
         yaxis_title="Score",
         font=dict(size=14),  # Adjust font size
@@ -447,7 +447,7 @@ def plot_overall_historical_trends(overall_trends, preferences):
                 name=category
             ))
     fig.update_layout(
-        title=f"Overall Portfolio - Historical ESG Trends",
+        title=f"Overall Portfolio - Historical Trends",
         xaxis_title="Year",
         yaxis_title="Score",
         font=dict(size=14),  # Adjust font size
